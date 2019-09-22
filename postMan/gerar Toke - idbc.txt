@@ -1,0 +1,15 @@
+__includeOnce(-1898141835); // /products/INTEQengine/configuration/iDBCsql library.ijs
+
+
+
+ var token = new ngin.security.AuthToken(
+        "ufs:engine_modules/erp-engine/scripts/executeControllerAction.js",
+        '',
+        false
+    );
+
+var expirationDate =  incDate(database.date, 60);
+
+token.description = 'teste REST';
+token.expires = this.expirationDate;
+this.token = session.authorizeToken(token);

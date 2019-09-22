@@ -1,0 +1,74 @@
+__includeOnce('ufs:/ngin/router/controller.js');
+__includeOnce('ufs:/bdo/orm/entityset.js');
+__includeOnce('ufs:/bdo/orm/entity.js');
+__includeOnce('ufs:/goog/array/array.js');
+__includeOnce('ufs:/goog/object/object.js');
+__includeOnce('ufs:/ngin/router/controller.js');
+__includeOnce('ufs:/ngin/keys/classes.js');
+__includeOnce('ufs:/ngin/http/error.js');
+__includeOnce('ufs:/ngin/http/status.js');
+
+__includeOnce(-1898191188); /* /inteq/library/server/keysUtilities.js */;
+__includeOnce(-1898191186); /* /inteq/library/server/queryUtilities.js */;
+__includeOnce(-1898147512); /* /inteq/library/server/connection.js */;
+__includeOnce(-1898146446); /* /inteq/library/server/session.js */;
+__includeOnce(-1898145959); /* /products/INTEQengine/library/QueryAnalyzer.js */;
+__includeOnce(-1898145408); /* /products/INTEQengine/library/ClassDefManager.ijs */;
+__includeOnce(-1898145684) /* /products/INTEQengine/library/formatters/JSON.js */
+
+
+var ServicePedido = function () {
+  ngin.router.Controller.call(this);
+};
+
+goog.inherits(ServicePedido, ngin.router.Controller);
+
+
+ServicePedido.prototype.consultarPedido = function (request, chcriacao) {
+
+    var result = {}
+
+
+    try{
+        var dsPedido = connection.getDataSet("
+        SELECT p.chcriacao, p.recurso, p.pessoa, p.quantidade, p.unitario,p.total,p.movimentac, p.emissao, p.aprovacao, p.chpedbaixa, p.numero,
+        p.tipo
+        FROM pedido p
+        where p.chcriacao="+chcriacao
+        )
+        
+        var dsCab = dsPedido.sum("chcriacao;pessoa;movimentac;emissao;aprovacao;numero;tipo", "total")
+        
+        result.chcriacao = dsCab.chcriacao
+        result.cnpj = dsCab.pessoa.cgccpf
+        result.nome = dsCab.pessoa.nome
+        result.emissao = dsCab.emissao.toString('dd/mm/yyyy')
+        result.numero = dsCab.numero
+        result.tipo = dsCab.tipo ? dsCab.tipo.codigo :''
+        result.total = dsCab.total
+        
+        var arItens = []
+        for (dsPedido.first(); !dsPedido.eof; dsPedido.next()) {
+
+            arItens.push( [ dsPedido.recurso.codigo, dsPedido.recurso.nome, dsPedido.quantidade, dsPedido.unitario])
+        }
+
+        result.itens = arItens
+        
+        
+
+        return this.ok( JSON.stringify(result) ).as("text/x-json");
+
+
+    } catch(e){
+        result.error = "Não foi possivel ler registro"
+        result.message = e.message
+        result.partNumber = partNumber
+        return this.badRequest(JSON.stringify(result)).as("text/x-json");
+    }
+
+
+};
+
+
+module.exports = ServicePedido;

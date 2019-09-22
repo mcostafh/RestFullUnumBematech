@@ -1,0 +1,14 @@
+module.exports = {
+    apiName: 'Engine Service File API',
+    basePath: '/api/api-troller/v1/pedido',
+    requiresAuth: false,
+    controller: 523247236,
+    routes: [
+        {
+            method: 'GET',
+             path: ':chcriacao<string>',
+            requiresAuth: false,
+            action: 'consultarPedido( request, chcriacao)'
+        }
+    ]
+};
